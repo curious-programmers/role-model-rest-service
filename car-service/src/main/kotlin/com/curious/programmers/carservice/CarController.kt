@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 
 
-data class Car(val id: String, val make: String, val model: String)
+data class AddCarRequest(val id: String, val make: String, val model: String)
 
 
 @RestController
@@ -18,8 +18,7 @@ class CarController {
 
 
     @PostMapping("cars")
-
-    fun post(@RequestBody car: Car): Flux<CarAggregate> {
+    fun post(@RequestBody car: AddCarRequest): Flux<CarAggregate> {
 
         var subscribe = carRepository.save(CarAggregate(car.id, car.make, car.model)).subscribe()
 
