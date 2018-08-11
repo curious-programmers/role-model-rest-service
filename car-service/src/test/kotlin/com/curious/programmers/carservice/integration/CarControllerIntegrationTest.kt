@@ -25,7 +25,7 @@ class CarControllerIntegrationTest {
 
         val addCarRequest = AddCarRequest("KT3R987", "BMW", "325i")
 
-        var returnResult = client.post()
+        client.post()
                 .uri("/cars")
                 .body(Mono.just(addCarRequest), AddCarRequest::class.java)
                 .exchange()
