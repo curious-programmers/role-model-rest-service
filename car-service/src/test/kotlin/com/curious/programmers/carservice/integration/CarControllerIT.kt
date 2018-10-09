@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureWebTestClient
-class CarControllerIntegrationTest {
+class CarControllerIT {
 
     @Autowired
     private lateinit var client: WebTestClient
