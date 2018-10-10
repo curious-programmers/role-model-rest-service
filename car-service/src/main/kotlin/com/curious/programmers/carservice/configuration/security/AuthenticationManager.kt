@@ -4,13 +4,10 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
 
-@Component
 class AuthenticationManager(val jwtUtil: JWTUtils) : ReactiveAuthenticationManager {
-
 
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         val authToken = authentication.credentials.toString()
@@ -25,18 +22,13 @@ class AuthenticationManager(val jwtUtil: JWTUtils) : ReactiveAuthenticationManag
         val validateToken = jwtUtil.validateToken(authToken)
 
         if (username != null && validateToken) {
-
-//            val claims = jwtUtil!!.getAllClaimsFromToken(authToken)
-//            val rolesMap = claims.get("role", List<*>::class.java)
-//            val roles = mutableListOf<String>()
-//            for (rolemap in rolesMap) {
-//                roles.add(rolemap)
-//            }
-
             val allClaimsFromToken = jwtUtil.getAllClaimsFromToken(authToken)
+            val rolesMap = allClaimsFromToken.get("role", List::class.java)
+
+            val roles = rolesMap.map { SimpleGrantedAuthority(it as String?) }
             val auth = UsernamePasswordAuthenticationToken(
                     username, null,
-                    listOf(SimpleGrantedAuthority("ADMIN"))
+                    roles
             )
             return Mono.just(auth)
         } else {

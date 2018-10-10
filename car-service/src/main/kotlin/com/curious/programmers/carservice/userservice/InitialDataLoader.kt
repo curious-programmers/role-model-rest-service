@@ -14,7 +14,7 @@ constructor(private val userRepo: UserRepository, private val carRepository: Car
     override fun run(vararg args: String) {
         var encode = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("password")
 
-        var deleteAll = userRepo.deleteAll().subscribe()
+        userRepo.deleteAll().subscribe()
         var save = userRepo.save(User("Dawid", encode))
         save.subscribe()
         println(userRepo.findByName("Dawid").block())

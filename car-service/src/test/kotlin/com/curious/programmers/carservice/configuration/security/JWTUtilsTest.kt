@@ -15,13 +15,6 @@ internal class JWTUtilsTest {
 
     @Test
     fun generateToken() {
-        val generateToken = jwtUtils.generateToken("Dawid")
-
-        val parseClaimsJws = Jwts.parser().setSigningKey(key).parseClaimsJws(generateToken)
-        println(parseClaimsJws.getBody().getSubject().equals("Dawid"))
-        println(generateToken)
-
-
         val user = User("dawid", "balbalbal", mutableListOf("ADMIN"))
 
         val generateToken1 = jwtUtils.generateToken(user)

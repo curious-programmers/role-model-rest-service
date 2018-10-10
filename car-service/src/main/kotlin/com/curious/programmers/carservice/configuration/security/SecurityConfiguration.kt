@@ -6,13 +6,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository
-import reactor.core.publisher.Mono
 
 
 @Configuration
@@ -28,15 +25,15 @@ class SecurityConfiguration {
 
 
     @Bean
-    fun springSecurityFilterChain(http: ServerHttpSecurity, authenticationWebFilter: JwtAuthenticationWebFilter,
+    fun springSecurityFilterChain(http: ServerHttpSecurity,
                                   unauthorizedEntryPoint: UnauhorizedEntryPoint,
-                                  reactiveAuthenticationManager: ReactiveAuthenticationManager): SecurityWebFilterChain {
+                                  reactiveAuthenticationManager: ReactiveAuthenticationManager,
+                                  securityContextRepository: SecurityContextRepository): SecurityWebFilterChain {
         http
                 .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedEntryPoint)
                 .and()
                 .authenticationManager(reactiveAuthenticationManager)
-                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers("/resources/**",
                         "/auth/**",
@@ -55,10 +52,8 @@ class SecurityConfiguration {
     }
 
     @Bean
-    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager {
-        return ReactiveAuthenticationManager { authentication ->
-            Mono.just(authentication)
-        }
+    fun reactiveAuthenticationManager(jwtUtils: JWTUtils): ReactiveAuthenticationManager {
+        return AuthenticationManager(jwtUtils)
     }
 
     @Bean
@@ -70,11 +65,10 @@ class SecurityConfiguration {
     fun jwtUtils(): JWTUtils = JWTUtils(Keys.hmacShaKeyFor(secret?.toByteArray(Charsets.UTF_8)))
 
     @Bean
-    fun securityContextRepository(): WebSessionServerSecurityContextRepository {
-        return WebSessionServerSecurityContextRepository()
-    }
-
-    @Bean
     fun unauthorizedEntryPoint(): UnauhorizedEntryPoint = UnauhorizedEntryPoint()
 
+    @Bean
+    fun securityContextRepository(reactiveAuthenticationManager: ReactiveAuthenticationManager): SecurityContextRepository {
+        return SecurityContextRepository(reactiveAuthenticationManager)
+    }
 }

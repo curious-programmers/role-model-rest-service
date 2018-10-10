@@ -9,28 +9,6 @@ import java.util.*
 
 class JWTUtils(val key: Key) {
 
-
-    fun generateToken(subject: String): String {
-
-        val claims = mutableMapOf<String, Any>(Pair("potato", "patator"))
-
-        val expirationDate = Date(Date().time + 1000 * 60 * 24 * 365)
-
-
-        return Jwts.builder()
-                .setIssuedAt(Date())
-                .setSubject(subject)
-                .setExpiration(expirationDate)
-//                .setClaims(claims)
-                .signWith(key)
-                .compact()
-    }
-
-    fun decodeToken(token: String): String {
-        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().audience
-    }
-
-
     fun getAllClaimsFromToken(token: String): Claims {
         return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody()
     }
