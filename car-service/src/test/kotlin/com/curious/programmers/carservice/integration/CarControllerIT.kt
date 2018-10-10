@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureWebTestClient
-class CarControllerIntegrationTest {
+class CarControllerIT {
 
     @Autowired
     private lateinit var client: WebTestClient
@@ -25,7 +25,7 @@ class CarControllerIntegrationTest {
 
         val addCarRequest = AddCarRequest("KT3R987", "BMW", "325i")
 
-        var returnResult = client.post()
+        client.post()
                 .uri("/cars")
                 .body(Mono.just(addCarRequest), AddCarRequest::class.java)
                 .exchange()
